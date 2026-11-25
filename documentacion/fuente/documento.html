@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Práctica de conjuntos</title><style>
+@page{size:letter;margin:2.3cm;@bottom-center{content:counter(page);font:9pt Georgia}}
+@page :first{@bottom-center{content:""}}
+body{font:11.5pt/1.55 Georgia,serif;font-variant-numeric:lining-nums;color:#111}
+.portada{height:22cm;display:flex;flex-direction:column;justify-content:space-between;text-align:center;break-after:page;padding:2cm 0;box-sizing:border-box}
+h1{font-size:25pt;margin:0}h2{font-size:17pt;break-after:avoid;margin-top:1.4em}h3{font-size:12pt;break-after:avoid}
+table{border-collapse:collapse;width:100%;font-size:10.5pt}td,th{border:1px solid #999;padding:5px 8px;text-align:left}th{background:#eee}tr{break-inside:avoid}
+pre{font:8pt/1.35 Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;border-left:2px solid #bbb;padding-left:10px}
+code{font:9.5pt Menlo,monospace}
+pre{background:#f4f4f4;border:0;padding:9px 12px;font-size:9pt;break-inside:avoid;white-space:pre}
+table{break-inside:avoid;margin:.6em 0 1em}h3{margin-bottom:.3em}
+p,li{orphans:3;widows:3}
+</style></head><body>
+<section class="portada"><div>{{UNIVERSIDAD}}</div><div><h1>Práctica de conjuntos</h1><p>Representación en vector y en lista ligada</p></div><div>{{INTEGRANTES}}</div><div>Algoritmos y Programación 4<br>Profesor: Gildardo Quintero C.</div></section>
+<h2>1. Introducción</h2>
+<p>Un conjunto es un grupo de elementos donde no hay repetidos y no importa el orden. Aunque la idea viene de las matemáticas, en informática se usa para organizar, comparar y combinar datos.</p>
+<p>Esta aplicación de consola, hecha en Java, trabaja con conjuntos de números enteros o textos. Se guardan de dos formas, en un vector y en una lista ligada, construidas sin usar las colecciones de Java. Los datos permanecen en memoria mientras el programa está abierto.</p>
+
+<h2>2. Importancia de los conjuntos en la informática</h2>
+<p>Muchas tareas del día a día se apoyan en conjuntos, aunque no se vean. Un registro que no acepta dos veces el mismo correo está evitando repetidos. Un buscador que muestra lo que coincide con dos palabras hace una intersección, y un sistema que revisa si un usuario tiene los permisos necesarios comprueba un subconjunto.</p>
+<p>Las bases de datos también ofrecen operaciones de unión, intersección y diferencia para combinar o descartar información. Por eso entender los conjuntos ayuda a expresar mejor un problema y a elegir una estructura adecuada para resolverlo.</p>
+
+<h2>3. Arquitectura del proyecto</h2>
+<pre>src/
+├── Main.java
+├── classes/
+│   ├── Nodo.java
+│   ├── ConjuntoEnVector.java
+│   └── ConjuntoEnLista.java
+├── menus/
+│   ├── MenuVector.java
+│   └── MenuLista.java
+└── utils/
+    └── Entrada.java</pre>
+<table><tr><th>Clase</th><th>Responsabilidad</th></tr>
+<tr><td>Main</td><td>Inicia el programa y permite elegir la representación.</td></tr>
+<tr><td>Nodo</td><td>Guarda un dato y la liga al siguiente nodo.</td></tr>
+<tr><td>ConjuntoEnVector</td><td>Guarda los elementos en un arreglo y realiza las operaciones.</td></tr>
+<tr><td>ConjuntoEnLista</td><td>Hace lo mismo con nodos enlazados.</td></tr>
+<tr><td>MenuVector y MenuLista</td><td>Piden los datos, llaman las operaciones y muestran los resultados.</td></tr>
+<tr><td>Entrada</td><td>Lee lo que escribe el usuario y valida que sea correcto.</td></tr></table>
+<pre>Main  -->  menus  -->  classes
+             |
+             +------>  utils</pre>
+<p>Los conjuntos no dependen de los menús ni de la lectura. Por eso se puede cambiar la forma de pedir los datos sin tocar las operaciones. Los atributos son privados y solo se modifican por medio de los métodos de cada clase.</p>
+<p>Los dos menús se parecen porque cada uno trabaja con su propio tipo de conjunto. Una interfaz común evitaría repetir código, pero se prefirió conservar las firmas de la guía y mantener el programa sencillo.</p>
+
+<h2>4. Representación en vector</h2>
+<p>La clase tiene dos atributos: <code>n</code>, que es la capacidad, y <code>vec</code>, el arreglo de elementos. Estos van seguidos desde la posición cero y el primer <code>null</code> marca el final.</p>
+<pre>n = 5
+
+posición     0      1      2      3      4
+vec       [ 10 ] [ 20 ] [ 30 ] [null] [null]     cantidad = 3</pre>
+<p>No es lo mismo cuánto cabe que cuánto hay: <code>getN</code> devuelve la capacidad y <code>cantidadDeElementos</code> cuenta las posiciones ocupadas. Al borrar, los elementos que siguen se corren a la izquierda para no dejar huecos:</p>
+<pre>Antes de borrar el 20     [ 10 ] [ 20 ] [ 30 ] [null] [null]
+Después                   [ 10 ] [ 30 ] [null] [null] [null]</pre>
+
+<h2>5. Representación en lista ligada</h2>
+<p>Aquí el único atributo propio de cada conjunto es <code>cab</code>, que apunta al primer nodo. Cada nodo lleva al siguiente y el último tiene la liga en <code>null</code>.</p>
+<pre>cab --> [10 | *] --> [20 | *] --> [30 | null]</pre>
+<p style="break-after:avoid">Casi todos los métodos usan este recorrido:</p>
+<pre>Nodo actual = cab;
+while (actual != null) {
+  // se usa actual.getDato()
+  actual = actual.getLiga();
+}</pre>
+<p>Para borrar se llevan dos referencias, <code>anterior</code> y <code>actual</code>. Si el elemento está en la cabeza, <code>cab</code> pasa al segundo nodo; en otro caso, el anterior se enlaza con el que sigue.</p>
+<pre>Antes de borrar el 20     [10] --> [20] --> [30]
+Después                   [10] -----------> [30]</pre>
+<table><tr><th></th><th>Vector</th><th>Lista ligada</th></tr>
+<tr><td>Tamaño</td><td>Se define al crearlo</td><td>Crece con cada nodo</td></tr>
+<tr><td>Recorrido</td><td>Por posición</td><td>Siguiendo la liga</td></tr>
+<tr><td>Búsqueda</td><td>Elemento por elemento</td><td>Nodo por nodo</td></tr>
+<tr><td>Borrado</td><td>Corre los elementos</td><td>Cambia una liga</td></tr></table>
+
+<h2>6. Conjunto universal</h2>
+<p>El universal se define primero y no se forma a partir de los demás. Es al contrario: A y B se construyen con elementos que ya están en él. Si se redefine, el programa vuelve a pedir A y B, porque podrían contener datos que ya no son válidos.</p>
+<p>Se guarda como atributo <code>static</code>, pues es uno solo y lo comparten todos los conjuntos de la clase. Así <code>complemento</code> no necesita recibirlo. Además se guarda una copia, para que un cambio en el conjunto original no lo altere.</p>
+
+<h2>7. Operaciones</h2>
+<table><tr><th>Operación</th><th>Cómo se obtiene</th></tr>
+<tr><td>Unión</td><td>Se copia A y se agregan los elementos de B; los repetidos se ignoran.</td></tr>
+<tr><td>Intersección</td><td>Se toman los elementos de A que pertenecen a B.</td></tr>
+<tr><td>Diferencia</td><td>Se toman los elementos de A que no pertenecen a B.</td></tr>
+<tr><td>Diferencia simétrica</td><td>Se unen A - B y B - A.</td></tr>
+<tr><td>Complemento</td><td>Se calcula la diferencia entre el universal y A.</td></tr>
+<tr><td>Pertenencia</td><td>Se busca el elemento y se revisa si tiene posición.</td></tr>
+<tr><td>Subconjunto</td><td>Se verifica que todos los elementos de A estén en B.</td></tr>
+<tr><td>Igualdad</td><td>Tienen la misma cantidad y A es subconjunto de B.</td></tr>
+<tr><td>Disjuntos</td><td>Se verifica que la intersección esté vacía.</td></tr></table>
+<p>Las cinco primeras devuelven un conjunto nuevo y no modifican los originales. Las demás responden verdadero o falso. La igualdad no necesita revisar el otro sentido: como no hay repetidos, si tienen la misma cantidad y todo A está en B, a B no le sobra nada.</p>
+<p>Varias operaciones se construyen con las anteriores. La diferencia simétrica es un buen ejemplo:</p>
+<pre>return diferencia(b).union(b.diferencia(this));</pre>
+
+<h2>8. Validaciones</h2>
+<ul><li>No se agregan elementos repetidos ni que estén fuera del universal.</li>
+<li>El universal no puede quedar vacío; A y B sí.</li>
+<li>Las opciones inválidas y los datos de otro tipo se vuelven a pedir.</li>
+<li>Los elementos se comparan con <code>equals</code>, por su contenido. En los textos se distinguen mayúsculas.</li>
+<li>El vector avisa si está lleno. En el menú, A y B tienen capacidad para todo el universal, así que no se desbordan.</li></ul>
+
+<h2>9. Resultados y pruebas</h2>
+<p>Con U = {1, 2, 3, 4, 5, 6}, A = {1, 2, 3} y B = {3, 4}, las dos representaciones dieron lo mismo:</p>
+<table><tr><th>Operación</th><th>Resultado</th></tr>
+<tr><td>Unión</td><td>{1, 2, 3, 4}</td></tr><tr><td>Intersección</td><td>{3}</td></tr>
+<tr><td>Diferencia A - B</td><td>{1, 2}</td></tr><tr><td>Diferencia simétrica</td><td>{1, 2, 4}</td></tr>
+<tr><td>Complemento de A</td><td>{4, 5, 6}</td></tr><tr><td>¿2 pertenece a A?</td><td>Sí</td></tr>
+<tr><td>¿A es subconjunto de B?</td><td>No</td></tr><tr><td>¿A y B son iguales?</td><td>No</td></tr><tr><td>¿A y B son disjuntos?</td><td>No</td></tr></table>
+<p>También se probaron conjuntos vacíos, textos, repetidos, entradas inválidas y el borrado al inicio, en el medio y al final de la lista. El proyecto compila con Java 21 sin advertencias.</p>
+
+<h2>10. Conclusiones</h2>
+<p>Un mismo conjunto se puede guardar de formas distintas sin que cambien sus operaciones. La unión da igual en el vector y en la lista; lo que cambia es la manera de recorrer los elementos para llegar a ella.</p>
+<p>Cada representación tiene lo suyo. El vector es directo, pero hay que darle un tamaño desde el principio y mover elementos al borrar. La lista crece según se necesite, aunque para llegar a un elemento toca pasar por los anteriores.</p>
+<p>La pertenencia resultó ser la base de casi todo. Con ella se resuelven la intersección, la diferencia y el subconjunto, y al combinarlas salen las demás sin repetir lógica.</p>
+<p>También queda claro por qué el universal va primero: sin él no hay contra qué calcular el complemento ni cómo saber qué elementos son válidos.</p>
+</body></html>

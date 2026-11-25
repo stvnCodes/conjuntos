@@ -5,7 +5,7 @@
 | 01 | ConjuntoEnVector | Implementada |
 | 02 | Nodo y ConjuntoEnLista | Implementada |
 | 03 | Menús, entrada y universal | Implementada |
-| 04 | Guía de sustentación y PDF | Pendiente |
+| 04 | Guía de sustentación y PDF | Falta completar portada y revisar conclusiones |
 
 ## Reglas comunes
 - Sin repetidos; el orden no importa.
