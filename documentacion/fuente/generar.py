@@ -6,12 +6,17 @@ import tempfile
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-INTEGRANTES = "Juan Estiven Posada Rua"
+INTEGRANTES = [
+    "Juan Estiven Posada Rua",
+    "Carlos Eduardo Hernández Munévar",
+    "Andrés Santiago Bedoya Yepes",
+]
 UNIVERSIDAD = "Politécnico Colombiano Jaime Isaza Cadavid"
 
 pagina = (pathlib.Path(__file__).parent / "documento.html").read_text()
-for clave, valor in {"INTEGRANTES": INTEGRANTES, "UNIVERSIDAD": UNIVERSIDAD}.items():
-    pagina = pagina.replace("{{" + clave + "}}", html.escape(valor))
+pagina = pagina.replace("{{UNIVERSIDAD}}", html.escape(UNIVERSIDAD))
+# Un integrante por línea en la portada
+pagina = pagina.replace("{{INTEGRANTES}}", "<br>".join(html.escape(nombre) for nombre in INTEGRANTES))
 
 with tempfile.TemporaryDirectory() as carpeta:
     origen = pathlib.Path(carpeta) / "documento.html"
